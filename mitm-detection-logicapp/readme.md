@@ -4,8 +4,8 @@ To get the most from this Logic App; the trigger URL should be part of your cust
 
 ```css
 .ext-footer {
-  background-image: url('URL-COPIED-FROM-LOGICAPP');
   background-size: 0 0;
+  background-image: url('URL-COPIED-FROM-LOGICAPP');
 }
 ```
 
