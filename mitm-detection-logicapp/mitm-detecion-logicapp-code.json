@@ -1,0 +1,190 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Condition_check_REFERER": {
+                "actions": {},
+                "else": {
+                    "actions": {
+                        "Terminate": {
+                            "inputs": {
+                                "runStatus": "Cancelled"
+                            },
+                            "runAfter": {},
+                            "type": "Terminate"
+                        }
+                    }
+                },
+                "expression": {
+                    "and": [
+                        {
+                            "not": {
+                                "equals": [
+                                    "@body('Parse_JSON_HTTP_Headers')?['Referer']",
+                                    "https://login.microsoftonline.com/"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Parse_JSON_HTTP_Headers": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "If"
+            },
+            "Initialize_variable_JsonBodyLogs": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "JsonBodyLogs",
+                            "type": "string",
+                            "value": "{\n\"LureType\": \"MITM Detection Custom CSS\",\n\"Referer\": \"@{body('Parse_JSON_HTTP_Headers')?['Referer']}\",\n\"ClientIp\": \"@{split(body('Parse_JSON_HTTP_Headers')?['CLIENT-IP'],':')[0]}\",\n\"UserAgent\": \"@{body('Parse_JSON_HTTP_Headers')?['User-Agent']}\"\n}"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Condition_check_REFERER": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize_variable_LogTableName": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "LogTableName",
+                            "type": "string",
+                            "value": "AzureLure_CL"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_JsonBodyLogs": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "PLACEHOLDER_FOR_ACTION-Azure_Log_Analytics_Data_Collector-Send_Data": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "PLACEHOLDER_FOR_ACTION-Azure_Log_Analytics_Data_Collector-Send_Data",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_LogTableName": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Parse_JSON_HTTP_Headers": {
+                "inputs": {
+                    "content": "@triggerOutputs()['headers']",
+                    "schema": {
+                        "properties": {
+                            "Accept": {
+                                "type": "string"
+                            },
+                            "Accept-Encoding": {
+                                "type": "string"
+                            },
+                            "Accept-Language": {
+                                "type": "string"
+                            },
+                            "CLIENT-IP": {
+                                "type": "string"
+                            },
+                            "Content-Length": {
+                                "type": "string"
+                            },
+                            "DISGUISED-HOST": {
+                                "type": "string"
+                            },
+                            "DNT": {
+                                "type": "string"
+                            },
+                            "Host": {
+                                "type": "string"
+                            },
+                            "Max-Forwards": {
+                                "type": "string"
+                            },
+                            "Referer": {
+                                "type": "string"
+                            },
+                            "Sec-Fetch-Dest": {
+                                "type": "string"
+                            },
+                            "Sec-Fetch-Mode": {
+                                "type": "string"
+                            },
+                            "Sec-Fetch-Site": {
+                                "type": "string"
+                            },
+                            "Sec-GPC": {
+                                "type": "string"
+                            },
+                            "User-Agent": {
+                                "type": "string"
+                            },
+                            "WAS-DEFAULT-HOSTNAME": {
+                                "type": "string"
+                            },
+                            "X-ARR-LOG-ID": {
+                                "type": "string"
+                            },
+                            "X-ARR-SSL": {
+                                "type": "string"
+                            },
+                            "X-AppService-Proto": {
+                                "type": "string"
+                            },
+                            "X-Forwarded-For": {
+                                "type": "string"
+                            },
+                            "X-Forwarded-Proto": {
+                                "type": "string"
+                            },
+                            "X-Forwarded-TlsVersion": {
+                                "type": "string"
+                            },
+                            "X-Original-URL": {
+                                "type": "string"
+                            },
+                            "X-SITE-DEPLOYMENT-ID": {
+                                "type": "string"
+                            },
+                            "X-WAWS-Unencoded-URL": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "runAfter": {},
+                "type": "ParseJson"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {
+            "manual": {
+                "inputs": {
+                    "method": "GET",
+                    "schema": {}
+                },
+                "kind": "Http",
+                "type": "Request"
+            }
+        }
+    },
+    "parameters": {}
+}
